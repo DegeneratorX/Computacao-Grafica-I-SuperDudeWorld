@@ -35,7 +35,6 @@ class Player(Sprite):
         #print(f"COORDENADAS PLAYER: {self._pos_x}, {self._pos_y}")
         #print(self._velocidade)
         if keys[K_LEFT]:
-
             if self._direcao == "up":
                 self.__rotacionar_em_torno_do_eixo(270)
             elif self._direcao == "right":

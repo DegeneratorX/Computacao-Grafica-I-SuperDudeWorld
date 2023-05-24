@@ -19,7 +19,7 @@ class Screen:
 
     def get_width(self):
         return self.__width
-    
+
     def get_height(self):
         return self.__height
 
@@ -43,7 +43,7 @@ class Screen:
             y = self.__screen.get_height()-1
 
         return self.__screen.get_at((x, y))
-    
+
     def set_pixel(self, x, y, color):
 
         # Se as coordenadas forem negativas, passam a ser no minimo zero.
@@ -97,7 +97,7 @@ class Color:
 
     def get_rgba(self):
         return self.__red, self.__green, self.__blue, self.__alpha
-    
+
     def set_rgba(self, color:tuple):
         red, green, blue, alpha = color
         if -1 < red < 256:
@@ -125,10 +125,10 @@ class Texture:
 
     def get_texture_instance(self):
         return self.__texture
-    
+
     def get_texture_matrix(self):
         return self.__texture_matrix
-    
+
         # get_pixel para textura
     def get_pixel_texture(self, x, y):
         if x < 0:
@@ -151,7 +151,7 @@ class Texture:
 
         return self.__texture_matrix[y][x]
 
-    
+
     def set_texture(self, path):
         self.__texture = Image.open(path)
         self.__texture = self.__texture.convert("RGB")
@@ -197,7 +197,7 @@ class Viewport:
             return poly, t
         else:
             return -1, t
-        
+
     def __intersecao_em_y(self, scan, pi, pf):
         xi, yi = pi
         xf, yf = pf
@@ -303,7 +303,7 @@ class Viewport:
                 else:
                     a, b, c, d = bin2
                     return (pi, (par, corte)), (bin1, (a, b, '0', d)), (cor1, cor)
-                
+
     def __calcula_bin(self, ponto):
         px, py = ponto
         ba = '0'
@@ -407,6 +407,7 @@ class Viewport:
                     pi, pf = arestas[a]
                     xi, yi = pi
                     if len(polcores[a]) == 2:
+                        self._conjunto_poligonos_cores.append([])
                         tx, ty = polcores[a]
                         newpol.insere_ponto(round(xi), round(yi), tx, ty)
                     else:
@@ -415,5 +416,5 @@ class Viewport:
                         newpol.insere_ponto(round(xi), round(yi), 0, 0)
                         if a == len(arestas)-1:
                             self._conjunto_poligonos_cores.append(matriz_cores)
-                    
+
             self._conjunto_poligonos_cortados.append(newpol)
