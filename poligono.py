@@ -186,6 +186,6 @@ def multiplicacao_matrizes(matriz_1, matriz_2):
     for i in range(linha_1):
         for j in range(coluna_2):
             for k in range(coluna_1):
-                resultado[i][j] += matriz_1[i][k] * matriz_2[k][j]
+                resultado[i][j] += round(matriz_1[i][k] * matriz_2[k][j])
     
     return resultado

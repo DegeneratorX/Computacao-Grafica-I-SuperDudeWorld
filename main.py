@@ -53,6 +53,7 @@ def main():
     opcoes_menu = ["Jogar", "Sair"]
     opcao_selecionada = 0
     textura = Texture("tile.jpg")
+    player_tile = Texture("player.jpg")
     running = True
     rotacao = 0
     while running:
@@ -76,7 +77,7 @@ def main():
                         player_x = 128
                         player_y = 112
                         player_speed = 5
-                        player = Player(player_x, player_y, player_speed)
+                        player = Player(player_x, player_y, player_speed, player_tile)
                         running_game = True
                         while running_game:
                             for event in pygame.event.get():
@@ -84,32 +85,30 @@ def main():
                                     running_game = False
 
                             keys = pygame.key.get_pressed()
-                            janela = player.mover(keys, janela)
+                            janela = player.mover_janela_e_player(keys, janela)
                             lista_de_mapeamentos = list()
-                            """
-                            for i in range(0,1000, 15):
-                                for j in range(0, 1000, 15):
-                                    bloco = [
-                                        [0+i, 0+j, 0, 0],
-                                        [15+i, 0+j, 1, 0],
-                                        [15+i, 15+j, 1, 1],
-                                        [0+i, 15+j, 0, 1],
-                                    ]
-                                    bloco_mapeado = Projecao(bloco, JANELA, VIEWPORT)
-                                    bloco_mapeado.get_poligono_mapeado()
-                                    chao_do_jogo.append(bloco_mapeado)
-                            """
 
                             bloco = [
                                 [0, 0, 0, 0],
-                                [300, 0, 1, 0],
-                                [300, 300, 1, 1],
-                                [0, 300, 0, 1],
+                                [32, 0, 1, 0],
+                                [32, 32, 1, 1],
+                                [0, 32, 0, 1],
                             ]
-                            bloco_mapeado = Projecao(bloco, janela, VIEWPORT)
+
+                            bloco_object = Poligono(bloco)
+
+                            if 60 < rotacao < 120:
+                                acumulo = Poligono.mover_poligono(20, 20)
+                                bloco_object.aplicar_transformacao_com_acumulos(acumulo)
+                            else:
+                                pass
+                            #rotacao += 1
+
+                            bloco_mapeado = Projecao(bloco_object.lista_poligono_customizado, janela, VIEWPORT)
                             bloco_mapeado.get_poligono_mapeado()
                             lista_de_mapeamentos.append(bloco_mapeado)
 
+                            """
                             trapezio = [
                                 [50, 50, 0, 0],
                                 [70, 50, 1, 0],
@@ -130,9 +129,9 @@ def main():
                             else:
                                 rotacao = -1
                             rotacao += 1
-                            
+                            """
                             player_sprite_mapeado = Projecao(
-                                player.get_player_sprite(), janela, VIEWPORT)
+                                player.get_player_poligono_objeto().lista_poligono_customizado, janela, VIEWPORT)
                             player_sprite_mapeado.get_poligono_mapeado()
                             lista_de_mapeamentos.append(player_sprite_mapeado)
                             
@@ -147,12 +146,9 @@ def main():
                                 Color(255, 255, 255, 0),
                             ]
 
-                            desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(
-                                0).lista_poligono_customizado, Color(0, 0, 0, 0), Color(200,100,100,0))
-                            desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(
-                                1).lista_poligono_customizado, Color(255, 255, 255), Color(255, 255, 255, 255))
-                            desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(
-                                    2).lista_poligono_customizado, Color(255, 255, 255), Color(255, 255, 255, 255))
+                            desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(0).lista_poligono_customizado, Color(0, 0, 0, 0), textura)
+                            #desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(1).lista_poligono_customizado, Color(255, 255, 255), Color(255, 255, 255, 255))
+                            desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(1).lista_poligono_customizado, Color(180,230,255,0), player_tile)
 
                             # iterar_lista_poligonos_cortados(
                             #    desenhar_na_screen, viewport_objeto.get_conjunto_poligonos_cortados_sem_indice(), textura)
