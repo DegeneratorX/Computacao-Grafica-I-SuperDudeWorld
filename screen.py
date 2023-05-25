@@ -406,6 +406,13 @@ class Viewport:
                 for a in range(len(arestas)):
                     pi, pf = arestas[a]
                     xi, yi = pi
+                    if xi < 0 or yi < 0:
+                        if a == len(arestas)-1:
+                            break
+                        a += 1
+                        pi, pf = arestas[a]
+                        xi, yi = pi
+                        
                     if len(polcores[a]) == 2:
                         self._conjunto_poligonos_cores.append([])
                         tx, ty = polcores[a]

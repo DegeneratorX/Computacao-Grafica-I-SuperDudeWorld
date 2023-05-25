@@ -14,18 +14,10 @@ def show_fps(screen, clock):
         "FPS: " + str(int(clock.get_fps())), True, pygame.Color("yellow"))
     screen.get_screen().blit(fps_text, (10, 10))
 
-
-"""
-def iterar_lista_poligonos_cortados(desenhar_na_screen, conjunto_poligonos, textura):
-    for pol in range(len(conjunto_poligonos)):
-        desenhar_na_screen.desenha_poligono(
-            conjunto_poligonos[pol].lista_poligono_customizado, Color(0, 0, 0, 0), textura)
-"""
-
 # TODO: Colocar objetos na tela
 # TODO: Substituir o sprite do player
 # TODO: Mudar o nome de alguma variáveis (especialmente as que estão em inglês)
-
+# TODO: Documentar o código
 
 def main():
     pygame.font.init()
@@ -79,7 +71,7 @@ def main():
                         player_speed = 5
                         player = Player(player_x, player_y, player_speed, player_tile)
                         running_game = True
-                        pause = False
+
                         while running_game:
                             for event in pygame.event.get():
                                 if event.type == QUIT:
@@ -87,10 +79,13 @@ def main():
 
                             keys = pygame.key.get_pressed()
                             janela = player.mover_janela_e_player(keys, janela)
+
                             lista_de_mapeamentos = list()
                             lista_de_cores = list()
+                            lista_de_arestas = list()
                             
                             ###########################################
+                            
                             bloco = [
                                 [0, 0, 0, 0],
                                 [32, 0, 1, 0],
@@ -114,34 +109,23 @@ def main():
 
                             ###########################################
 
-                            pos_x, pos_y = player.get_position()
-                            if 10 < pos_x < 100 or 10 < pos_y < 100:
-                                trapezio = [
-                                    [50, 50, 0, 0],
-                                    [70, 50, 1, 0],
-                                    [70, 70, 1, 1],
-                                    [50, 70, 0, 1],
-                                ]
+                            trapezio = [
+                                [50, 50, 0, 0],
+                                [70, 50, 1, 0],
+                                [90, 70, 1, 1],
+                                [30, 70, 0, 1],
+                            ]
 
-                                trapezio_objeto = Poligono(trapezio)
+                            trapezio_objeto = Poligono(trapezio)
 
-                                if rotacao < 360:
-                                    acumulo = Poligono.mover_poligono(-60, -60)
-                                    acumulo = Poligono.rotacionar_poligono(rotacao, acumulo)
-                                    acumulo = Poligono.mover_poligono(+60, +60, acumulo)
-                                    trapezio_objeto.aplicar_transformacao_com_acumulos(acumulo)
-                                else:
-                                    rotacao = -1
-                                rotacao += 1
-
+                            if rotacao < 360:
+                                acumulo = Poligono.mover_poligono(-60, -60)
+                                acumulo = Poligono.rotacionar_poligono(rotacao, acumulo)
+                                acumulo = Poligono.mover_poligono(+60, +60, acumulo)
+                                trapezio_objeto.aplicar_transformacao_com_acumulos(acumulo)
                             else:
-                                trapezio = [
-                                    [0,0,0,0],
-                                    [0,0,0,0],
-                                    [0,0,0,0],
-                                    [0,0,0,0],
-                                ]
-                                trapezio_objeto = Poligono(trapezio)
+                                rotacao = -1
+                            rotacao += 1
 
                             trapezio_objeto_mapeado = Projecao(trapezio_objeto.lista_poligono_customizado, janela,
                                                                 VIEWPORT)
@@ -149,6 +133,7 @@ def main():
                             lista_de_mapeamentos.append(trapezio_objeto_mapeado)
                             lista_de_cores.append([])
 
+                            
                             ###########################################
 
                             player_sprite_mapeado = Projecao(player.get_player_poligono_objeto().lista_poligono_customizado, janela, VIEWPORT)
@@ -158,16 +143,31 @@ def main():
 
                             ###########################################
 
+                            arestas = [
+                                [10,10, 0, 0],
+                                [50, 50, 0, 0],
+                            ]
+                            arestas_objeto = Poligono(arestas)
+                            arestas_mapeado = Projecao(arestas_objeto.lista_poligono_customizado, janela, VIEWPORT)
+                            arestas_mapeado.get_poligono_mapeado()
+                            lista_de_arestas.append(arestas_mapeado.lista_poligono_mapeado
+                                                    )
+                            lista_de_cores.append([])
+
+                            ###########################################
+
                             viewport_objeto = Viewport(
                                 viewport_x_inicial, viewport_y_inicial, viewport_x_final, viewport_y_final, lista_de_mapeamentos)
                             viewport_objeto.update_viewport(lista_de_cores)
 
+                            ###########################################
+
                             desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(0).lista_poligono_customizado, Color(0, 0, 0, 0), viewport_objeto.get_conjunto_poligonos_cores(0))
-                            desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(1).lista_poligono_customizado, Color(255, 255, 255), Color(255, 255, 255, 255))
+                            desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(1).lista_poligono_customizado, Color(255, 255, 255), textura)
                             desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(2).lista_poligono_customizado, Color(180,230,255,0), player_tile)
+                            desenhar_na_screen.reta_DDA(lista_de_arestas[0][0][0], lista_de_arestas[0][0][1], lista_de_arestas[0][1][0], lista_de_arestas[0][1][1], Color(255, 0, 0))
 
                             show_fps(screen_object, clock)
-
 
                             pygame.display.update()
 
