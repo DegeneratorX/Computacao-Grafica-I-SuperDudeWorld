@@ -87,7 +87,9 @@ def main():
                             keys = pygame.key.get_pressed()
                             janela = player.mover_janela_e_player(keys, janela)
                             lista_de_mapeamentos = list()
-
+                            lista_de_cores = list()
+                            
+                            ###########################################
                             bloco = [
                                 [0, 0, 0, 0],
                                 [32, 0, 1, 0],
@@ -95,66 +97,62 @@ def main():
                                 [0, 32, 0, 1],
                             ]
 
-                            bloco_object = Poligono(bloco)
-
-                            if 60 < rotacao < 120:
-                                acumulo = Poligono.mover_poligono(20, 20)
-                                bloco_object.aplicar_transformacao_com_acumulos(acumulo)
-                            else:
-                                pass
-                            #rotacao += 1
-
-                            bloco_mapeado = Projecao(bloco_object.lista_poligono_customizado, janela, VIEWPORT)
-                            bloco_mapeado.get_poligono_mapeado()
-                            lista_de_mapeamentos.append(bloco_mapeado)
-
-                            """
-                            trapezio = [
-                                [50, 50, 0, 0],
-                                [70, 50, 1, 0],
-                                [80, 100, 1, 1],
-                                [40, 100, 0, 1],
-                            ]
-
-                            trapezio_objeto = Poligono(trapezio)
-
-                            if rotacao < 360:
-                                acumulo = Poligono.mover_poligono(-50,-50)
-                                acumulo = Poligono.rotacionar_poligono(rotacao, acumulo)
-                                acumulo = Poligono.mover_poligono(+50,+50, acumulo)
-                                trapezio_objeto.aplicar_transformacao_com_acumulos(acumulo)
-                                trapezio_objeto_mapeado = Projecao(trapezio_objeto.lista_poligono_customizado, janela, VIEWPORT)
-                                trapezio_objeto_mapeado.get_poligono_mapeado()
-                                lista_de_mapeamentos.append(trapezio_objeto_mapeado)
-                            else:
-                                rotacao = -1
-                            rotacao += 1
-                            """
-                            player_sprite_mapeado = Projecao(
-                                player.get_player_poligono_objeto().lista_poligono_customizado, janela, VIEWPORT)
-                            player_sprite_mapeado.get_poligono_mapeado()
-                            lista_de_mapeamentos.append(player_sprite_mapeado)
-                            
-                            viewport_objeto = Viewport(
-                                viewport_x_inicial, viewport_y_inicial, viewport_x_final, viewport_y_final, lista_de_mapeamentos)
-                            viewport_objeto.update_viewport()
-
-                            lista_cores = [
+                            degrade = [
                                 Color(255, 0, 0, 0),
                                 Color(0, 255, 0, 0),
                                 Color(0, 0, 255, 0),
                                 Color(255, 255, 255, 0),
                             ]
 
-                            desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(0).lista_poligono_customizado, Color(0, 0, 0, 0), textura)
-                            #desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(1).lista_poligono_customizado, Color(255, 255, 255), Color(255, 255, 255, 255))
+                            bloco_object = Poligono(bloco)
+                            bloco_mapeado = Projecao(bloco_object.lista_poligono_customizado, janela, VIEWPORT)
+                            bloco_mapeado.get_poligono_mapeado()
+                            lista_de_mapeamentos.append(bloco_mapeado)
+                            lista_de_cores.append(degrade)
+                            
+                            ############################################
+
+
+                            player_sprite_mapeado = Projecao(player.get_player_poligono_objeto().lista_poligono_customizado, janela, VIEWPORT)
+                            player_sprite_mapeado.get_poligono_mapeado()
+                            lista_de_mapeamentos.append(player_sprite_mapeado)
+                            lista_de_cores.append([])
+
+                            viewport_objeto = Viewport(
+                                viewport_x_inicial, viewport_y_inicial, viewport_x_final, viewport_y_final, lista_de_mapeamentos)
+                            viewport_objeto.update_viewport(lista_de_cores)
+
+                            ###########################################
+
+                            pos_x, pos_y = player.get_position()
+                            if 10 < pos_x < 100 or 10 < pos_y < 100:
+                                trapezio = [
+                                    [50, 50, 0, 0],
+                                    [70, 50, 1, 0],
+                                    [70, 70, 1, 1],
+                                    [50, 70, 0, 1],
+                                ]
+
+                                trapezio_objeto = Poligono(trapezio)
+
+                                if rotacao < 360:
+                                    acumulo = Poligono.mover_poligono(-60, -75)
+                                    acumulo = Poligono.rotacionar_poligono(rotacao, acumulo)
+                                    acumulo = Poligono.mover_poligono(+60, +75, acumulo)
+                                    trapezio_objeto.aplicar_transformacao_com_acumulos(acumulo)
+                                else:
+                                    rotacao = -1
+                                rotacao += 1
+                                trapezio_objeto_mapeado = Projecao(trapezio_objeto.lista_poligono_customizado, janela,
+                                                                   VIEWPORT)
+                                trapezio_objeto_mapeado.get_poligono_mapeado()
+                                lista_de_mapeamentos.append(trapezio_objeto_mapeado)
+                                lista_de_cores.append([])
+
+                            desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(0).lista_poligono_customizado, Color(0, 0, 0, 0), viewport_objeto.get_conjunto_poligonos_cores(0))
                             desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(1).lista_poligono_customizado, Color(180,230,255,0), player_tile)
-
-                            # iterar_lista_poligonos_cortados(
-                            #    desenhar_na_screen, viewport_objeto.get_conjunto_poligonos_cortados_sem_indice(), textura)
-
-                            # pygame.draw.rect(screen_object.get_screen(), (255, 255, 255), pygame.Rect(
-                            #    player_x-8, player_y-8, 16, 16))
+                            if len(viewport_objeto.get_conjunto_poligonos_cortados_sem_indice()) == 3:
+                                desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(2).lista_poligono_customizado, Color(255, 255, 255), Color(255, 255, 255, 255))
 
                             show_fps(screen_object, clock)
                             pygame.display.update()
@@ -162,8 +160,6 @@ def main():
                             for i in range(viewport_y_final):
                                 for j in range(viewport_x_final):
                                     screen_object.get_screen().set_at((j, i), (180,230,255,0))
-
-                            # screen_object.get_screen().fill((0, 0, 0))
                             clock.tick(60)
 
                         pygame.quit()

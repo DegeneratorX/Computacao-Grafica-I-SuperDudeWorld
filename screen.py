@@ -337,7 +337,7 @@ class Viewport:
                         arestas.append((lista_vertices[vertice], lista_vertices[0]))
                 polbin.append(self.__calcula_bin(lista_vertices[vertice]))
 
-            if scanline_color is None:
+            if len(scanline_color[index]) == 0:
                 preenchimento = [(linha[2], linha[3]) for linha in pol.lista_poligono_customizado]
             else:
                 preenchimento = []

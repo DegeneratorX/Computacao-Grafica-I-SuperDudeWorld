@@ -85,13 +85,13 @@ class Poligono:
         ], acumulo)
     
     @staticmethod
-    def rotacionar_poligono(angulo, acumulo=[[1,0,0],[0,1,0],[0,0,1]]):
+    def rotacionar_poligono(angulo, acumulo=[[1,0,0],[0,1,0],[0,0,1]], player=False):
         angulo = angulo*np.pi/180
         return multiplicacao_matrizes([
             [np.cos(angulo), -np.sin(angulo), 0],
             [np.sin(angulo), np.cos(angulo),  0],
             [0, 0,                            1]
-        ], acumulo)
+        ], acumulo, player)
     
 
     def aplicar_transformacao_com_acumulos(self, acumulo):
@@ -174,7 +174,7 @@ def transposta(matriz):
     
     return transposta
 
-def multiplicacao_matrizes(matriz_1, matriz_2):
+def multiplicacao_matrizes(matriz_1, matriz_2, player=False):
     linha_1, coluna_1 = len(matriz_1), len(matriz_1[0])
     linha_2, coluna_2 = len(matriz_2), len(matriz_2[0])
     
@@ -186,6 +186,8 @@ def multiplicacao_matrizes(matriz_1, matriz_2):
     for i in range(linha_1):
         for j in range(coluna_2):
             for k in range(coluna_1):
-                resultado[i][j] += round(matriz_1[i][k] * matriz_2[k][j])
-    
+                if player:
+                    resultado[i][j] += round(matriz_1[i][k] * matriz_2[k][j])
+                else:
+                    resultado[i][j] += (matriz_1[i][k] * matriz_2[k][j])
     return resultado
