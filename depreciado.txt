@@ -1,0 +1,2 @@
+Poligono.get_bloco_mapeado(32, 32, 16, degrade, pilha_de_mapeamentos)
+desenhar_na_screen.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(0).lista_poligono_customizado, Color(0, 0, 0, 0), viewport_objeto.get_conjunto_poligonos_cores(0))

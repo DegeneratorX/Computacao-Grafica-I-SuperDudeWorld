@@ -362,6 +362,14 @@ class PilhaMapeamentos:
         self._lista_de_arestas = lista_de_arestas
 
     @property
+    def janela(self):
+        return self._janela
+
+    @property
+    def viewport(self):
+        return self._viewport
+
+    @property
     def lista_de_mapeamentos(self):
         return self._lista_de_mapeamentos
     

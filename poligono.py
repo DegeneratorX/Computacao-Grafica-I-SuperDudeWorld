@@ -39,6 +39,19 @@ class Poligono:
             raise AttributeError("Objeto de pintura do polígono não é de um tipo válido.")
         
         return bloco_mapeado
+    
+    def get_poligono_customizado_mapeado(self, scanline_color, pilha_de_mapeamentos):
+        poligono_mapeado = Projecao(self.lista_poligono_customizado, pilha_de_mapeamentos.janela, pilha_de_mapeamentos.viewport)
+        poligono_mapeado.get_poligono_mapeado()
+        pilha_de_mapeamentos.lista_de_mapeamentos.append(poligono_mapeado)
+        if isinstance(scanline_color, Color) or isinstance(scanline_color, Texture):
+            pilha_de_mapeamentos.lista_de_cores.append([])
+        elif isinstance(scanline_color, list):
+            pilha_de_mapeamentos.lista_de_cores.append(scanline_color)
+        else:
+            raise AttributeError("Objeto de pintura do polígono não é de um tipo válido.")
+        
+        return poligono_mapeado
 
     # Acúmulo = matriz que acumula transformações sucessivas em uma identidade (inicialmente) para depois ser aplicada
     # ao polígono.

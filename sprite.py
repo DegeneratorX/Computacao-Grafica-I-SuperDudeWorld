@@ -4,16 +4,15 @@ from abc import ABC
 from poligono import *
 
 class Sprite(ABC):
-    def __init__(self, pos_x, pos_y, velocidade, gfx) -> None:
+    def __init__(self, pos_x, pos_y, velocidade) -> None:
         self._pos_x = pos_x
         self._pos_y = pos_y
         self._velocidade = velocidade
-        self._gfx = gfx
 
 
 class Player(Sprite):
-    def __init__(self, pos_x, pos_y, velocidade, gfx) -> None:
-        super().__init__(pos_x, pos_y, velocidade, gfx)
+    def __init__(self, pos_x, pos_y, velocidade) -> None:
+        super().__init__(pos_x, pos_y, velocidade)
         self._player_sprite = [
             [self._pos_x-8,self._pos_y-8,0,0],
             [self._pos_x+8,self._pos_y-8,1,0],
@@ -35,6 +34,7 @@ class Player(Sprite):
     def mover_janela_e_player(self, keys, janela):
         janela_x_inicial, janela_y_inicial, janela_x_final, janela_y_final = janela
         #print(F"COORDENADAS JANELA: {janela_x_inicial}, {janela_y_inicial}, {janela_x_final}, {janela_y_final}")
+
         print(f"COORDENADAS PLAYER: {self._pos_x}, {self._pos_y}")
         #print(self._velocidade)
         if keys[K_LEFT]:
@@ -110,3 +110,40 @@ class Player(Sprite):
         acumulo = Poligono.rotacionar_poligono(angulo, acumulo, player=True)
         acumulo = Poligono.mover_poligono(+self._pos_x,+self._pos_y, acumulo)
         self._player_poligono_objeto.aplicar_transformacao_com_acumulos(acumulo)
+
+class Coletavel(Sprite):
+    def __init__(self, pos_x, pos_y, velocidade, rotacao) -> None:
+        super().__init__(pos_x, pos_y, velocidade)
+
+        self._coletavel_sprite = [
+            [pos_x+0, pos_y+4, 0, 0],
+            [pos_x+5, pos_y+4, 0, 0],
+            [pos_x+7, pos_y+0, 0, 0],
+            [pos_x+8, pos_y+0, 0, 0],
+            [pos_x+10, pos_y+4, 0, 0],
+            [pos_x+15, pos_y+4, 0, 0],
+            [pos_x+12, pos_y+8, 0, 0],
+            [pos_x+12, pos_y+9, 0, 0],
+            [pos_x+15, pos_y+15, 0, 0],
+            [pos_x+8, pos_y+12, 0, 0],
+            [pos_x+7, pos_y+12, 0, 0],
+            [pos_x+0, pos_y+15, 0, 0],
+            [pos_x+4, pos_y+9, 0, 0],
+            [pos_x+4, pos_y+8, 0, 0],
+        ]
+        self._coletavel_poligono_objeto = Poligono(self._coletavel_sprite)
+        self._rotacao = rotacao
+        self._rotacionar()
+
+    def get_coletavel_sprite(self):
+        return self._coletavel_sprite
+    
+    def get_coletavel_poligono_objeto(self):
+        return self._coletavel_poligono_objeto
+    
+    def _rotacionar(self):
+        if self._rotacao < 360:
+            acumulo = Poligono.mover_poligono(-8, -8)
+            acumulo = Poligono.rotacionar_poligono(self._rotacao, acumulo)
+            acumulo = Poligono.mover_poligono(+8, +8, acumulo)
+            self._coletavel_poligono_objeto.aplicar_transformacao_com_acumulos(acumulo)
