@@ -1,7 +1,6 @@
 import pygame
-import numpy as np
 from poligono import *
-from PIL import Image
+from desenho import Color
 
 class Screen:
     # Construtor da classe Screen
@@ -75,87 +74,6 @@ class Screen:
     def update():
         pygame.display.update()
 
-class Color:
-
-    def __init__(self, red, green, blue, alpha=255):
-        if -1 < red < 256:
-            self.__red = red
-        else:
-            self.__red = 0
-        if -1 < green < 256:
-            self.__green = green
-        else:
-            self.__green = 0
-        if -1 < blue < 256:
-            self.__blue = blue
-        else:
-            self.__blue = 0
-        if -1 < alpha < 256:
-            self.__alpha = alpha
-        else:
-            self.__alpha = 255
-
-    def get_rgba(self):
-        return self.__red, self.__green, self.__blue, self.__alpha
-
-    def set_rgba(self, color:tuple):
-        red, green, blue, alpha = color
-        if -1 < red < 256:
-            self.__red = red
-        else:
-            self.__red = 0
-        if -1 < green < 256:
-            self.__green = green
-        else:
-            self.__green = 0
-        if -1 < blue < 256:
-            self.__blue = blue
-        else:
-            self.__blue = 0
-        if -1 < alpha < 256:
-            self.__alpha = alpha
-        else:
-            self.__alpha = 255
-
-class Texture:
-    def __init__(self, path) -> None:
-        self.__texture = Image.open(path)
-        self.__texture = self.__texture.convert("RGB")
-        self.__texture_matrix = np.asarray(self.__texture)
-
-    def get_texture_instance(self):
-        return self.__texture
-
-    def get_texture_matrix(self):
-        return self.__texture_matrix
-
-        # get_pixel para textura
-    def get_pixel_texture(self, x, y):
-        if x < 0:
-            x = 0
-        if y < 0:
-            y = 0
-
-        if x > 1:
-            x = 1
-        if y > 1:
-            y = 1
-
-        x = round(x*self.__texture_matrix.shape[1])
-        y = round(y*self.__texture_matrix.shape[0])
-
-        if x >= self.__texture_matrix.shape[1]:
-            x = self.__texture_matrix.shape[1] - 1
-        if y >= self.__texture_matrix.shape[0]:
-            y = self.__texture_matrix.shape[1] - 1
-
-        return self.__texture_matrix[y][x]
-
-
-    def set_texture(self, path):
-        self.__texture = Image.open(path)
-        self.__texture = self.__texture.convert("RGB")
-        self.__texture_matrix = np.asarray(self.__texture)
 
 class Viewport:
     def __init__(self, x_inicial, y_inical, x_final, y_final ,conjunto_poligonos=None) -> None:
@@ -425,3 +343,32 @@ class Viewport:
                             self._conjunto_poligonos_cores.append(matriz_cores)
 
             self._conjunto_poligonos_cortados.append(newpol)
+
+class PilhaMapeamentos:
+    def __init__(self, janela, viewport, lista_de_mapeamentos=None, lista_de_cores=None, lista_de_arestas=None) -> None:
+        self._janela = janela
+        self._viewport = viewport
+
+        if lista_de_mapeamentos == None:
+            lista_de_mapeamentos = []
+        self._lista_de_mapeamentos = lista_de_mapeamentos
+
+        if lista_de_cores == None:
+            lista_de_cores = []
+        self._lista_de_cores = lista_de_cores
+
+        if lista_de_arestas == None:
+            lista_de_arestas = []
+        self._lista_de_arestas = lista_de_arestas
+
+    @property
+    def lista_de_mapeamentos(self):
+        return self._lista_de_mapeamentos
+    
+    @property
+    def lista_de_cores(self):
+        return self._lista_de_cores
+    
+    @property
+    def lista_de_arestas(self):
+        return self._lista_de_arestas

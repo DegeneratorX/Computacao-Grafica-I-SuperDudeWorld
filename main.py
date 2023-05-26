@@ -68,7 +68,7 @@ def main():
 
                         player_x = 128
                         player_y = 112
-                        player_speed = 5
+                        player_speed = 4
                         player = Player(player_x, player_y, player_speed, player_tile)
                         running_game = True
 

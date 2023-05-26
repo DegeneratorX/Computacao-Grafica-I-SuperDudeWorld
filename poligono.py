@@ -1,4 +1,5 @@
 import numpy as np
+from desenho import Color, Texture
 
 class Poligono:
     def __init__(self, lista_poligono_customizado=None):
@@ -18,53 +19,26 @@ class Poligono:
     def insere_ponto(self, x, y, tx, ty):
         self._lista_poligono_customizado.append([x, y, tx, ty])
 
-    # Quadrado
     @staticmethod
-    def bloco(origem_x, origem_y, lado):
-        metade_lado = int(round(lado/2))
-        if lado%2 == 0:
-            lista_poligono = [
-                [origem_x-metade_lado, origem_y-metade_lado, 0, 0],
-                [origem_x+metade_lado-1, origem_y-metade_lado, 1, 0],
-                [origem_x+metade_lado-1, origem_y+metade_lado-1, 1, 1],
-                [origem_x-metade_lado, origem_y+metade_lado-1, 0, 1],
-            ]
-        else:
-            lista_poligono = [
-                [origem_x-metade_lado, origem_y-metade_lado, 0, 0],
-                [origem_x+metade_lado, origem_y-metade_lado, 1, 0],
-                [origem_x+metade_lado, origem_y+metade_lado, 1, 1],
-                [origem_x-metade_lado, origem_y+metade_lado, 0, 1],
-            ]
-        return lista_poligono
-
-    # Triângulo retângulo metade de um quadrado
-    @staticmethod
-    def meio_bloco(origem_x, origem_y, lado):
-        metade_lado = int(round(lado/2))
-        if lado%2==0:
-            lista_poligono = [
-                [origem_x-metade_lado, origem_y+metade_lado-1],
-                [origem_x+metade_lado-1, origem_y-metade_lado],
-                [origem_x+metade_lado-1, origem_y+metade_lado-1],
-            ]
-        else:
-            lista_poligono = [
-                [origem_x-metade_lado, origem_y+metade_lado],
-                [origem_x+metade_lado, origem_y-metade_lado],
-                [origem_x+metade_lado, origem_y+metade_lado],
-            ]
-        return lista_poligono
-
-    @staticmethod
-    def retangulo(origem, base, altura):
+    def get_bloco_mapeado(origem_x, origem_y, tamanho, scanline_color, pilha_de_mapeamentos):
         lista_poligono = [
-            [origem-base/2, origem+altura/2],
-            [origem+base/2, origem+altura/2],
-            [origem+base/2, origem-altura/2],
-            [origem-base/2, origem-altura/2],
+            [origem_x, origem_y, 0, 0],
+            [origem_x+tamanho, origem_y, 1, 0],
+            [origem_x+tamanho, origem_y+tamanho, 1, 1],
+            [origem_x, origem_y+tamanho, 0, 1],
         ]
-        return lista_poligono
+        bloco_object = Poligono(lista_poligono)
+        bloco_mapeado = Projecao(bloco_object.lista_poligono_customizado, pilha_de_mapeamentos.janela, pilha_de_mapeamentos.viewport)
+        bloco_mapeado.get_poligono_mapeado()
+        pilha_de_mapeamentos.lista_de_mapeamentos.append(bloco_mapeado)
+        if isinstance(scanline_color, Color) or isinstance(scanline_color, Texture):
+            pilha_de_mapeamentos.lista_de_cores.append([])
+        elif isinstance(scanline_color, list):
+            pilha_de_mapeamentos.lista_de_cores.append(scanline_color)
+        else:
+            raise AttributeError("Objeto de pintura do polígono não é de um tipo válido.")
+        
+        return bloco_mapeado
 
     # Acúmulo = matriz que acumula transformações sucessivas em uma identidade (inicialmente) para depois ser aplicada
     # ao polígono.
