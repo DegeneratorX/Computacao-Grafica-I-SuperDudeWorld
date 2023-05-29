@@ -37,6 +37,21 @@ def fim_de_jogo(screen):
         screen.get_pygame_screen().blit(texto_pressioneenter_desenhar, (48, 130))
         pygame.display.update()
 
+        texto_creditos1_objeto = pygame.font.Font(None, 14)
+        texto_creditos1_desenhar = texto_creditos1_objeto.render("Feito por:" , False, pygame.Color("black"))
+        screen.get_pygame_screen().blit(texto_creditos1_desenhar, (4, 194))
+        pygame.display.update()
+
+        texto_creditos2_objeto = pygame.font.Font(None, 14)
+        texto_creditos2_desenhar = texto_creditos2_objeto.render("MIRAILTON MOTA COSTA FILHO" , False, pygame.Color("black"))
+        screen.get_pygame_screen().blit(texto_creditos2_desenhar, (4, 202))
+        pygame.display.update()
+
+        texto_creditos3_objeto = pygame.font.Font(None, 14)
+        texto_creditos3_desenhar = texto_creditos3_objeto.render("VICTOR MEDEIROS MARTINS" , False, pygame.Color("black"))
+        screen.get_pygame_screen().blit(texto_creditos3_desenhar, (4, 210))
+        pygame.display.update()
+
 
 
 # TODO: Colocar objetos na tela
@@ -77,17 +92,19 @@ def main():
     opcao_selecionada = 0
 
     # Carregamento de texturas e instanciação de classes que criei desse tipo
-    textura_cimento = Textura("cementblock.png")
-    textura_zoom = Textura("zoom.png")
-    textura_boo = Textura("boo.png")
-    textura_gato = Textura("gato.jpg")
-    textura_bulletbill = Textura("bulletbill.png")
-    textura_player = Textura("player.png")
+    textura_cimento = Textura("assets/cementblock.png")
+    textura_zoom = Textura("assets/zoom.png")
+    textura_boo = Textura("assets/boo.png")
+    textura_gato = Textura("assets/gato.png")
+    textura_bulletbill = Textura("assets/bulletbill.png")
+    textura_banana = Textura("assets/banana.png")
+    textura_player = Textura("assets/player.png")
 
     # Variável de controle para rotação do sprite coletável estrela
     rotacao = 0
 
     contador_de_movimentos_bullet_bill = 0
+    bullet_esquerda = True
 
     tela_inicial = True
     while tela_inicial:
@@ -126,6 +143,7 @@ def main():
                         estrelas_coletadas = []
                         dentro_do_zoom_in = False
                         dentro_do_zoom_out = False
+                        dentro_da_banana = False
                         tela_jogavel = True
                         ##### Aqui começa a lógica do jogo #####
                         while tela_jogavel:
@@ -270,13 +288,40 @@ def main():
                             ###########################################
                             # Bullet Bill no mapa
                             bulletbill_obj = Poligono(shapes.bulletbill)
-
-                            if contador_de_movimentos_bullet_bill < 30:
-                                acumulo = Poligono.mover_poligono(-5, 0)
+                            
+                            if contador_de_movimentos_bullet_bill < 15:
+                                if bullet_esquerda:
+                                    acumulo = Poligono.redimensionar_poligono(1.2, 1.2)
+                                else:
+                                    acumulo = Poligono.redimensionar_poligono(1.0/1.2, 1.0/1.2)
+                                bulletbill_obj.aplicar_transformacao_com_acumulos(acumulo)
                                 contador_de_movimentos_bullet_bill += 1
-                            if contador_de_movimentos_bullet_bill == 30:
+                            if contador_de_movimentos_bullet_bill == 15:
                                 contador_de_movimentos_bullet_bill = 0
-                                bullet_esquerda = False
+                                if bullet_esquerda:
+                                    bullet_esquerda = False
+                                else:
+                                    bullet_esquerda = True
+                            
+                            bulletbill_obj.get_poligono_customizado_mapeado(pilha_de_mapeamentos)
+
+                            ###########################################
+                            ###########################################
+                            # Instanciação da banana (easter egg)
+                            banana_obj = Poligono(shapes.banana)
+                            pos_x, pos_y = jogador.get_posicao()
+                            if 0 < pos_x < 16 and 350 < pos_y < 366 and dentro_da_banana == False:
+                                acumulo = Poligono.redimensionar_poligono(1.4, 1.4)
+                                acumulo = Poligono.mover_poligono(-5, -100, acumulo)
+                                banana_obj.aplicar_transformacao_com_acumulos(acumulo)
+                            elif ((0 >= pos_x or pos_x >= 16) or (350 >= pos_y or pos_y >= 366)) and dentro_da_banana == True:
+                                acumulo = Poligono.redimensionar_poligono(1/1.4, 1/1.4)
+                                acumulo = Poligono.mover_poligono(+5, +100, acumulo)
+                                banana_obj.aplicar_transformacao_com_acumulos(acumulo)
+
+                            banana_obj.get_poligono_customizado_mapeado(pilha_de_mapeamentos)
+                            ###########################################
+                            ###########################################
 
                             # Instanciação de sprites (coletáveis) pelo mapa
 
@@ -299,6 +344,9 @@ def main():
                             coletavel_3 = Coletavel.inserir_coletavel(3, -330, 240, rotacao, jogador, estrelas_coletadas)
                             coletavel_3.get_coletavel_poligono_objeto().get_poligono_customizado_mapeado(pilha_de_mapeamentos)
 
+                            coletavel_4 = Coletavel.inserir_coletavel(4, -260, -260, rotacao, jogador, estrelas_coletadas)
+                            coletavel_4.get_coletavel_poligono_objeto().get_poligono_customizado_mapeado(pilha_de_mapeamentos)
+
                             # Se todos os coletáveis foram coletados, o jogo acaba.
                             if len(estrelas_coletadas) == 5:
                                 fim_de_jogo(tela_objeto)
@@ -316,7 +364,6 @@ def main():
                             # Instanciação de um objeto de viewport, para que eu possa trabalhar melhor com os dados.
                             # Isso me daria també ma possibilidade de criar múltiplas viewports.
                             viewport_objeto = Viewport(viewport_x_inicial, viewport_y_inicial, viewport_x_final, viewport_y_final, pilha_de_mapeamentos.lista_de_mapeamentos)
-                            print(pilha_de_mapeamentos.lista_de_cores)
 
                             # Clipping
                             viewport_objeto.update_viewport(pilha_de_mapeamentos.lista_de_cores)
@@ -350,14 +397,21 @@ def main():
                             # Renderização e scanline do boo
                             desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(35).lista_poligono_customizado, Cor(180, 230, 255, 0), textura_boo)
 
+                            # Renderização e scanline do bulletbill
+                            desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(36).lista_poligono_customizado, Cor(180, 230, 255, 0), textura_bulletbill)
+
+                            # Renderização da banana
+                            desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(37).lista_poligono_customizado, Cor(180, 230, 255, 0), textura_banana)
+
                             # Renderização dos coletáveis
-                            desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(36).lista_poligono_customizado, Cor(238, 255, 0, 0), Cor(238, 255, 0, 0))
-                            desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(37).lista_poligono_customizado, Cor(238, 255, 0, 0), Cor(238, 255, 0, 0))
                             desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(38).lista_poligono_customizado, Cor(238, 255, 0, 0), Cor(238, 255, 0, 0))
                             desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(39).lista_poligono_customizado, Cor(238, 255, 0, 0), Cor(238, 255, 0, 0))
+                            desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(40).lista_poligono_customizado, Cor(238, 255, 0, 0), Cor(238, 255, 0, 0))
+                            desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(41).lista_poligono_customizado, Cor(238, 255, 0, 0), Cor(238, 255, 0, 0))
+                            desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(42).lista_poligono_customizado, Cor(238, 255, 0, 0), Cor(238, 255, 0, 0))
 
                             # Por fim, o player precisa ter prioridade, então é desenhado por último
-                            desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(40).lista_poligono_customizado, Cor(180,230,255,0), textura_player)
+                            desenhar_na_tela.desenha_poligono(viewport_objeto.get_conjunto_poligonos_cortados(43).lista_poligono_customizado, Cor(180,230,255,0), textura_player)
 
                             # Mostra o FPS do jogo
                             mostrar_fps(tela_objeto, clock)
