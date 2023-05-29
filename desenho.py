@@ -6,6 +6,8 @@ class Desenho:
     def __init__(self, screen):
         self.__screen = screen
 
+    # Desenha uma senóide na matriz. O problema é que ela só itera em x, e quando
+    # vai desenhar em y, pontos desenhados no mesmo x não é possível.
     def senoide_com_distorcao(self, color):
         # Para cada x que eu estiver
         for x in range(self.__screen.get_width()):
@@ -17,6 +19,7 @@ class Desenho:
             y = int(y)
             self.__screen.set_pixel(x, y, color)
 
+    # Essa senóide utiliza reta DDA para preencher falhas.
     def senoide_sem_distorcao(self, color):
         # Defino o ponto inicial
         x_anterior = 0
@@ -105,9 +108,9 @@ class Desenho:
                     # TODO: Erro ao multiplicar float com classe Color. O que fazer?
                     # Preciso reduzir em % de acordo com a intensidade da cor cada cor para o antiserrilhado.
 
-                    color_serrilhado_1 = Color(round(
+                    color_serrilhado_1 = Cor(round(
                         (1-y_decimal)*red), round((1-y_decimal)*green), round((1-y_decimal)*blue), alpha)
-                    color_serrilhado_2 = Color(
+                    color_serrilhado_2 = Cor(
                         round((y_decimal)*red), round((y_decimal)*green), round((y_decimal)*blue), alpha)
 
                     self.__screen.set_pixel(int(round(x)), int(
@@ -117,9 +120,9 @@ class Desenho:
                 else:
                     x_decimal = x - np.floor(x)
 
-                    color_serrilhado_1 = Color(round(
+                    color_serrilhado_1 = Cor(round(
                         (1-x_decimal)*red), round((1-x_decimal)*green), round((1-x_decimal)*blue), alpha)
-                    color_serrilhado_2 = Color(
+                    color_serrilhado_2 = Cor(
                         round((x_decimal)*red), round((x_decimal)*green), round((x_decimal)*blue), alpha)
 
                     self.__screen.set_pixel(int(np.floor(x)), int(
@@ -275,7 +278,6 @@ class Desenho:
                 y_anterior = y
 
     # Uso não recomendado/depreciado (causa estouro na call stack dependendo do tamanho do preenchimento)
-
     def flood_fill_recursivo(self, x_setar, y_setar, cor_nova, cor_inicial, primeira_vez_executando=True):
         if self.__screen.get_pixel(x_setar, y_setar) == cor_nova:
             if primeira_vez_executando:
@@ -312,9 +314,9 @@ class Desenho:
             # Verifico pra onde vai os próximos pixels, esquerda, direita, cima e baixo.
             if y > 0:
                 pilha.append((x, y-1))
-            if x < self.__screen.get_width():
+            if x < self.__screen.get_largura():
                 pilha.append((x+1, y))
-            if y < self.__screen.get_height():
+            if y < self.__screen.get_altura():
                 pilha.append((x, y+1))
             if x > 0:
                 pilha.append((x-1, y))
@@ -323,25 +325,38 @@ class Desenho:
             if y == 0:
                 pilha.append((x, y))
 
+    # Método principal que leva ao desenho das arestas e ao scanline para a matriz do pygame.
     def desenha_poligono(self, lista_poligono, color, scanline_color=None):
+        # Se a lista do polígono tá vazia, não desenha.
         if not lista_poligono:
             return
+        # Capturo o vértice inicial.
         x = lista_poligono[0][0]
         y = lista_poligono[0][1]
+
+        # Vou desenhando as arestas usando DDA.
         for i in range(1, len(lista_poligono)):
-            self.reta_DDA(
-                x, y, lista_poligono[i][0], lista_poligono[i][1], color)
+            self.reta_DDA(x, y, lista_poligono[i][0], lista_poligono[i][1], color)
             x = lista_poligono[i][0]
             y = lista_poligono[i][1]
+        
+        # Fecho a última aresta.
         self.reta_DDA(x, y, lista_poligono[0][0], lista_poligono[0][1], color)
+
+        # Verifico se tem scanline.
         if scanline_color is not None:
-            if isinstance(scanline_color, Color):
+            # Se for uma cor simples, será scanline sólido flat
+            if isinstance(scanline_color, Cor):
                 self.__scanline_simples(lista_poligono, scanline_color)
+            # Se for uma lista de cores, será um scanline de degradê/interpolação de cores 
+            # (número de vértices precisa ser igual ao de cores)
             elif isinstance(scanline_color, list):
                 self.__scanline_degrade(lista_poligono, scanline_color)
-            elif isinstance(scanline_color, Texture):
+            # Se for um objeto do tipo Textura, será um scanline de textura.
+            elif isinstance(scanline_color, Textura):
                 self.__scanline_texture(lista_poligono, scanline_color)
 
+    # Algoritmo de interseção.
     def __intersecao(self, y_da_scanline, segmento_de_reta):
         x_inicial, y_inicial, x_final, y_final = segmento_de_reta[0][
             0], segmento_de_reta[0][1], segmento_de_reta[1][0], segmento_de_reta[1][1]
@@ -365,7 +380,8 @@ class Desenho:
             return (x, t)
 
         return (-1, -1)
-
+    
+    # Algoritmo de scanline flat sólido.
     def __scanline_simples(self, lista_poligono, color):
         # Capturo o valor mínimo e máximo de y de um polígono na coluna dos "y" da matriz de polígonos
         # Com esses valores, consigo determinar a altura total do polígono e saber por onde a scanline
@@ -440,6 +456,7 @@ class Desenho:
                     self.__screen.set_pixel(
                         pintar_pixel_em_x, y_da_scanline, color)
 
+    # Algoritmo de scanline para interpolação de cores.
     def __scanline_degrade(self, lista_poligono, lista_cores_vertices):
         y_minimo = min(coluna[1] for coluna in lista_poligono)
         y_maximo = max(coluna[1] for coluna in lista_poligono)
@@ -538,10 +555,11 @@ class Desenho:
                     color = tuple(color)
                     r, g, b, a = color
                     self.__screen.set_pixel(
-                        pintar_pixel_em_x, y_da_scanline, Color(r, g, b, a))
+                        pintar_pixel_em_x, y_da_scanline, Cor(r, g, b, a))
 
-    # O algoritmo de interseção muda um pouco, pois agora precisamos passar uma estrutura de dados no formato [[xi, yi], [xf, yf]]
-    # para o segmento de reta.
+    # O algoritmo de interseção muda um pouco com textura, pois agora precisamos 
+    # passar uma estrutura de dados no formato [[xi, yi], [xf, yf]] para o segmento 
+    # de reta.
     def __instersecao_para_textura(self, y_da_scanline, segmento_de_reta):
         # Aqui trabalho com pontos (x,y) ao invés de individualmente, mas é a mesma coisa.
         ponto_inicial = segmento_de_reta[0]
@@ -606,13 +624,13 @@ class Desenho:
                     x_da_textura = i[ponto_intersecao][2] + porcentagem_de_cor*(i[ponto_intersecao+1][2] - i[ponto_intersecao][2])
                     y_da_textura = i[ponto_intersecao][3] + porcentagem_de_cor*(i[ponto_intersecao+1][3] - i[ponto_intersecao][3])
                     
-                    cor = textura.get_pixel_texture(x_da_textura, y_da_textura)
-                    r, g, b = cor
+                    cor = textura.get_pixel_textura(x_da_textura, y_da_textura)
+                    r, g, b, a = cor
 
-                    self.__screen.set_pixel(pintar_pixel_em_x, y_da_scanline, Color(r, g, b))
+                    self.__screen.set_pixel(pintar_pixel_em_x, y_da_scanline, Cor(r, g, b, a))
 
-class Color:
-
+# Classe que lida com cores.
+class Cor:
     def __init__(self, red, green, blue, alpha=255):
         if -1 < red < 256:
             self.__red = red
@@ -653,20 +671,21 @@ class Color:
         else:
             self.__alpha = 255
 
-class Texture:
+# Classe que trata as texturas e transforma em objetos para serem trabalhados.
+class Textura:
     def __init__(self, path) -> None:
-        self.__texture = Image.open(path)
-        self.__texture = self.__texture.convert("RGB")
-        self.__texture_matrix = np.asarray(self.__texture)
+        self.__textura = Image.open(path)
+        self.__textura = self.__textura.convert("RGBA")
+        self.__textura_matriz = np.asarray(self.__textura)
 
-    def get_texture_instance(self):
-        return self.__texture
+    def get_textura_objeto(self):
+        return self.__textura
 
-    def get_texture_matrix(self):
-        return self.__texture_matrix
+    def get_textura_matriz(self):
+        return self.__textura_matriz
 
         # get_pixel para textura
-    def get_pixel_texture(self, x, y):
+    def get_pixel_textura(self, x, y):
         if x < 0:
             x = 0
         if y < 0:
@@ -677,18 +696,18 @@ class Texture:
         if y > 1:
             y = 1
 
-        x = round(x*self.__texture_matrix.shape[1])
-        y = round(y*self.__texture_matrix.shape[0])
+        x = round(x*self.__textura_matriz.shape[1])
+        y = round(y*self.__textura_matriz.shape[0])
 
-        if x >= self.__texture_matrix.shape[1]:
-            x = self.__texture_matrix.shape[1] - 1
-        if y >= self.__texture_matrix.shape[0]:
-            y = self.__texture_matrix.shape[1] - 1
+        if x >= self.__textura_matriz.shape[1]:
+            x = self.__textura_matriz.shape[1] - 1
+        if y >= self.__textura_matriz.shape[0]:
+            y = self.__textura_matriz.shape[1] - 1
 
-        return self.__texture_matrix[y][x]
+        return self.__textura_matriz[y][x]
 
 
-    def set_texture(self, path):
-        self.__texture = Image.open(path)
-        self.__texture = self.__texture.convert("RGB")
-        self.__texture_matrix = np.asarray(self.__texture)
+    def set_textura(self, path):
+        self.__textura = Image.open(path)
+        self.__textura = self.__textura.convert("RGB")
+        self.__textura_matriz = np.asarray(self.__textura)

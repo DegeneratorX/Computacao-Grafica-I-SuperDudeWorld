@@ -1,6 +1,7 @@
 import numpy as np
-from desenho import Color, Texture
+from desenho import Cor, Textura
 
+# Classe de polígono. Guarda a lista de polígono dele e o polígono mapeado correspondente da viewport.
 class Poligono:
     def __init__(self, lista_poligono_customizado=None):
         if lista_poligono_customizado is None:
@@ -19,40 +20,47 @@ class Poligono:
     def insere_ponto(self, x, y, tx, ty):
         self._lista_poligono_customizado.append([x, y, tx, ty])
 
+    # Mapeia um bloco padrão 16x16 na viewport.
     @staticmethod
-    def get_bloco_mapeado(origem_x, origem_y, tamanho, scanline_color, pilha_de_mapeamentos):
+    def get_bloco_mapeado(origem_x, origem_y, tamanho, pilha_de_mapeamentos, degrade=None):
         lista_poligono = [
             [origem_x, origem_y, 0, 0],
             [origem_x+tamanho, origem_y, 1, 0],
             [origem_x+tamanho, origem_y+tamanho, 1, 1],
             [origem_x, origem_y+tamanho, 0, 1],
         ]
+        # Instancio o bloco 16x16
         bloco_object = Poligono(lista_poligono)
+
+        # Conversão do bloco em sua forma bruta para uma forma pós-transformação linear que é mapeado para uma viewport.
         bloco_mapeado = Projecao(bloco_object.lista_poligono_customizado, pilha_de_mapeamentos.janela, pilha_de_mapeamentos.viewport)
-        bloco_mapeado.get_poligono_mapeado()
+        bloco_mapeado.get_poligono_mapeado() # Transformação linear para coordenadas de viewport.
+
+        # Adiciono o bloco a lista de blocos mapeados
         pilha_de_mapeamentos.lista_de_mapeamentos.append(bloco_mapeado)
-        if isinstance(scanline_color, Color) or isinstance(scanline_color, Texture):
+
+        # Preciso também adicionar as cores dos vértices.
+        if degrade == None:
             pilha_de_mapeamentos.lista_de_cores.append([])
-        elif isinstance(scanline_color, list):
-            pilha_de_mapeamentos.lista_de_cores.append(scanline_color)
         else:
-            raise AttributeError("Objeto de pintura do polígono não é de um tipo válido.")
-        
+            pilha_de_mapeamentos.lista_de_cores.append(degrade)
+
         return bloco_mapeado
     
-    def get_poligono_customizado_mapeado(self, scanline_color, pilha_de_mapeamentos):
+    # Mesma coisa do método de cima, só que não devolve mais 16x16 padronizado, e sim 
+    # um bloco que o usuário instanciou nessa classe aqui mapeado.
+    def get_poligono_customizado_mapeado(self, pilha_de_mapeamentos, degrade=None):
         poligono_mapeado = Projecao(self.lista_poligono_customizado, pilha_de_mapeamentos.janela, pilha_de_mapeamentos.viewport)
         poligono_mapeado.get_poligono_mapeado()
         pilha_de_mapeamentos.lista_de_mapeamentos.append(poligono_mapeado)
-        if isinstance(scanline_color, Color) or isinstance(scanline_color, Texture):
+        if degrade == None:
             pilha_de_mapeamentos.lista_de_cores.append([])
-        elif isinstance(scanline_color, list):
-            pilha_de_mapeamentos.lista_de_cores.append(scanline_color)
         else:
-            raise AttributeError("Objeto de pintura do polígono não é de um tipo válido.")
+            pilha_de_mapeamentos.lista_de_cores.append(degrade)
         
         return poligono_mapeado
 
+    # Métodos de transformações lineares em um polígono: translação, escala e rotação
     # Acúmulo = matriz que acumula transformações sucessivas em uma identidade (inicialmente) para depois ser aplicada
     # ao polígono.
     @staticmethod
@@ -81,6 +89,9 @@ class Poligono:
         ], acumulo, player)
     
 
+    # Aplica as transformações lineares em cima da lista de vértices.
+    # Basicamente é feito um produto do acúmulo de transformações sucessivas sobre 
+    # cada vértice do polígono.
     def aplicar_transformacao_com_acumulos(self, acumulo):
         self._lista_poligono_customizado = np.array(self._lista_poligono_customizado)
         
@@ -93,9 +104,12 @@ class Poligono:
             ponto_poligono = np.transpose(ponto_poligono)
             self._lista_poligono_customizado[i, :2] = ponto_poligono[:2]
         
-        return self._lista_poligono_customizado.tolist()
+        self._lista_poligono_customizado = self._lista_poligono_customizado.tolist()
+        return self._lista_poligono_customizado
 
 
+# Classe que transforma um polígono em um polígono mapeado na viewport. Por via das
+# dúvidas, eu fiz uma classe ,mas acho que não havia necessidade.
 class Projecao(Poligono):
     def __init__(self, lista_poligono_customizado, lista_janela, lista_viewport) -> None:
         super().__init__(lista_poligono_customizado)
@@ -126,26 +140,7 @@ class Projecao(Poligono):
         self._lista_poligono_mapeado = self.aplicar_transformacao_com_acumulos(matriz_mapeamento)
         return self._lista_poligono_mapeado
 
-    # DEPRECIADA: esse método é para viewport estática, o primeiro tipo que o yuri deu em sala.
-    """
-    def get_poligono_mapeado(self):
-        largura_viewport = self.lista_viewport[0]
-        altura_viewport = self.lista_viewport[1]
-
-        x_inicial = self.lista_janela[0]
-        y_inicial = self.lista_janela[1]
-
-        x_final = self.lista_janela[2]
-        y_final = self.lista_janela[3]
-
-        matriz_mapeamento = [
-            [largura_viewport/(x_final-x_inicial),                0,                   -(x_inicial*largura_viewport)/(x_final-x_inicial)],
-            [               0,                    altura_viewport/(y_final-y_inicial),  -(y_inicial*altura_viewport)/(y_final-y_inicial)],
-            [               0,                                    0,                                             1                      ]
-        ]
-        return self.aplicar_transformacao_com_acumulos(matriz_mapeamento)
-        """
-
+# Transposta sem numpy.
 def transposta(matriz):
     if isinstance(matriz[0], int) or len(matriz) == 1:
         return matriz
@@ -161,6 +156,7 @@ def transposta(matriz):
     
     return transposta
 
+# Multiplica duas matrizes sem numpy.
 def multiplicacao_matrizes(matriz_1, matriz_2, player=False):
     linha_1, coluna_1 = len(matriz_1), len(matriz_1[0])
     linha_2, coluna_2 = len(matriz_2), len(matriz_2[0])
@@ -173,6 +169,9 @@ def multiplicacao_matrizes(matriz_1, matriz_2, player=False):
     for i in range(linha_1):
         for j in range(coluna_2):
             for k in range(coluna_1):
+                # Se a transformação linear é sobre o player, terei que arredondar os resultados de float na multiplicação valor por valor
+                # pois a rotação envolve multiplicações de valores trigonométricos, o que pode gerar distorções no sprite do
+                # jogador. Se quiser ver o efeito disso, basta tirar o round() e movimentar bastante o player pros lados.
                 if player:
                     resultado[i][j] += round(matriz_1[i][k] * matriz_2[k][j])
                 else:
