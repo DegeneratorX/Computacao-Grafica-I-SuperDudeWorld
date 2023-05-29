@@ -11,8 +11,9 @@ Reta Bresenham: Mirailton
 Circunferência, Elipse: Victor
 Transformações lineares (translação, escala e rotação), janela e viewport: Victor
 Algoritmo de Clipping: Mirailton
-Texturas utilizadas: Nintendo, assets do Super Mario World
-Estrutura de classes, tela inicial, lógica do jogo: Victor
+Texturas utilizadas: assets do jogo Super Mario World, da Nintendo
+Estrutura de classes, tela inicial: Victor
+Lógica do jogo: Mirailton e Victor
 
 A tela inicial, como solicitada pelo professor, utiliza algoritmos de baixo nível para desenho.
 
