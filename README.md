@@ -21,7 +21,7 @@ A tela inicial, como solicitada pelo professor, utiliza algoritmos de baixo nív
 - Circunferência (seletor de opção de jogar ou sair)
 - Floodfill preenchendo a circunferência e a elipse
 - Todas as letras foram desenhadas no braço, todas são polígonos, e preenchidas com floodfill.
-    - Isso inclui as letras miúdas de jogar/sair
+    - Isso inclui as letras miúdas de jogar/sair.
 
 A tela de jogo é exibida conforme uma janela recorta as coordenadas de mundo, e essa tela já é a viewport. O algoritmo de clipping funciona, e para ver isso acontecer, basta maximizar a janela do pygame. Todos os objetos são mapeados para a viewport e recortados.
 
