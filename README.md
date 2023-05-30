@@ -4,7 +4,7 @@ Esse trabalho foi elaborado para a disciplina de **Computação Gráfica CK0245*
 - Mirailton Mota Costa Filho
 - Victor Medeiros Martins
 
-O trabalho escolhido foi um jogo. Todo o jogo foi feito no braço, usando apenas o método set_at() do pygame para a renderização dos objetos na tela, a fonte do pygame e o pillow para carregamento de imagens e transformar em matrizes.
+O trabalho escolhido foi um jogo. Todo o jogo foi feito no braço, usando apenas o método set_at() (setpixel) do pygame para colocar um único pixel de cor RGB na matriz de tela, para assim tornar possível a criação de retas, formas geométricas diversas e renderização dos objetos na tela. Também foi utilizada a fonte do pygame para exibição de dados e o pillow para carregamento de imagens e conversão para matrizes.
 
 RetaDDA, floodfill, scanlines: Mirailton e Victor
 Reta Bresenham: Mirailton
@@ -40,7 +40,7 @@ A estrela por si só é um polígono, que é formado por uma estrutura de dados 
 
 > Nota: a borda do jogo é o polígono vermelho/preto. Ela cobre uma região de 1000 de largura e 1000 de altura. Além desse limite nada foi colocado.
 
-O sprite do jogador também, com inputs do usuário, translada e rotaciona. A rotação do jogador precisou ser arredondada (round()) a cada iteração, pois ao trabalhar com valores trigonométricos em float, ao mudar o sentido do player, gerava distorções em seu sprite.
+O sprite do jogador também, com inputs do usuário, translada e rotaciona. A rotação do jogador precisou ser arredondada (round()) a cada iteração, pois ao trabalhar com valores trigonométricos em float, ao mudar o sentido do player, gerava distorções em seu sprite. A janela translada, acompanhando a movimentação do sprite do jogador.
 
 Ao coletar as 5 estrelas, o jogo termina.
 
@@ -48,4 +48,4 @@ Ao coletar as 5 estrelas, o jogo termina.
 
 É necessário instalar o pygame (pip install pygame) e o pillow (pip install pillow). Ambos os comandos se utiliza no terminal.
 
-Para executar o jogo, basta executar a main.py. Para executar no terminal, basta digitar "python3 main.py" sem aspas, na pasta do jogo.
+Para executar o jogo, basta executar a main.py com o projeto aberto. Para executar no terminal, basta digitar "python3 main.py" sem aspas, na pasta do jogo.
